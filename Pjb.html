@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palpite Diário</title>
+    <link id="favicon" rel="icon" type="image/jpg" href="https://example.com/default-favicon.jpg">
+    <style>
+        body {
+            background: blue;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #image-container {
+            text-align: center;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        #displayed-image {
+            width: 100%;
+            height: auto;
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+
+        #time-info {
+            font-size: 24px;
+            font-weight: bold;
+            position: absolute;
+            color: white;
+            margin-top: 80px;
+            text-align: center;
+            margin-left: 15%;
+        }
+
+        .btn {
+            display: block;
+            width: 90%;
+            max-width: 300px;
+            margin: 5px auto;
+            background: skyblue;
+            color: black;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #007BFF;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            #image-container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>PALPITE DIÁRIO</h1>
+    <p id="time-info"></p>
+    <div id="image-container">
+        <img id="displayed-image" src="" alt="Imagem">
+    </div>
+    <button class="btn" onclick="enviarWhatsApp()">JOGAR</button>
+
+    <script>
+        const images = [
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image01.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image02.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image03.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image04.jpg",
+            "https://raw.githubusercontent.com/SuaSortehoje/multipalpite/refs/heads/main/image05.jpg"
+        ];
+
+        function getNextTimeSlot() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            if (hours < 10 || (hours === 9 && minutes <= 59)) return "10:00";
+            if (hours < 12) return "12:00";
+            if (hours < 15) return "15:00";
+            if (hours < 19) return "19:00";
+            if (hours < 22) return "22:00";
+            return "06:00"; // Volta para o próximo dia
+        }
+
+        function setFavicon(imageUrl) {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
+
+            canvas.width = 64;
+            canvas.height = 64;
+
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, 64, 64);
+                const faviconUrl = canvas.toDataURL("image/png");
+                document.getElementById("favicon").href = faviconUrl;
+            };
+
+            img.crossOrigin = "anonymous";
+            img.src = imageUrl;
+        }
+
+        function updateImageAndTime() {
+            const now = new Date();
+            const currentSlot = getNextTimeSlot();
+            const storedSlot = localStorage.getItem("timeSlot");
+            const storedImageIndex = localStorage.getItem("imageIndex");
+
+            if (currentSlot !== storedSlot) {
+                const newImageIndex = Math.floor(Math.random() * images.length);
+                localStorage.setItem("timeSlot", currentSlot);
+                localStorage.setItem("imageIndex", newImageIndex);
+
+                const newImage = images[newImageIndex];
+                document.getElementById("displayed-image").src = newImage;
+                setFavicon(newImage);
+                document.getElementById("time-info").textContent = `Próximo horário: ${currentSlot}`;
+            } else if (storedImageIndex !== null) {
+                const storedImage = images[storedImageIndex];
+                document.getElementById("displayed-image").src = storedImage;
+                setFavicon(storedImage);
+                document.getElementById("time-info").textContent = `Próximo horário: ${storedSlot}`;
+            }
+        }
+
+        function enviarWhatsApp() {
+            window.location.href = "https://parceiros.jbpopular.com/pagead?token=adc66470f8b6cfd7aace53ac655c5e7b";
+        }
+
+        updateImageAndTime();
+        setInterval(updateImageAndTime, 60000);
+    </script>
+</body>
+</html>
